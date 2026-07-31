@@ -193,9 +193,8 @@
   <div class="tabs">
     <div class="tab active" data-tab="visao">Visão Geral</div>
     <div class="tab" data-tab="gastos">Gastos</div>
-    <div class="tab" data-tab="cartao">Cartão</div>
     <div class="tab" data-tab="relatorio">Relatório</div>
-    <div class="tab" data-tab="metas">Metas</div>
+    <div class="tab" data-tab="metas">Dívidas</div>
     <div class="tab" data-tab="agenda">Agenda</div>
     <div class="tab" data-tab="historico">Histórico</div>
   </div>
@@ -260,25 +259,6 @@
     </div>
   </div>
 
-  <!-- CARTÃO -->
-  <div class="panel" id="panel-cartao">
-    <div class="card">
-      <h3>Configuração do cartão</h3>
-      <div class="two-col">
-        <div class="field"><label>Limite total (R$)</label><input type="number" step="0.01" id="ccLimit"></div>
-        <div class="field"><label>Dia de vencimento</label><input type="number" min="1" max="31" id="ccDueDay"></div>
-      </div>
-      <button class="primary" onclick="saveCardConfig()">Salvar</button>
-    </div>
-    <div class="card">
-      <h3>Fatura do mês</h3>
-      <div class="row"><span>Total na fatura</span><span class="amt expense" id="ccInvoice">R$ 0</span></div>
-      <div class="row"><span>Limite disponível</span><span class="amt income" id="ccAvailable">R$ 0</span></div>
-      <div class="bar-bg"><div class="bar-fill" id="ccBar" style="width:0%"></div></div>
-      <div class="small-note">Calculado a partir dos lançamentos marcados como "Cartão de crédito" neste mês. Use o filtro Tudo/Pessoal/Empresa na Visão Geral pra ver só a parte da fatura que é de cada um.</div>
-    </div>
-  </div>
-
   <!-- RELATÓRIO -->
   <div class="panel" id="panel-relatorio">
     <div class="card">
@@ -287,6 +267,7 @@
       <div class="field"><label>Total vendido (R$)</label><input type="number" step="0.01" id="relVendido"></div>
       <div class="field"><label>Total recebido (R$)</label><input type="number" step="0.01" id="relRecebido"></div>
       <div class="field"><label>Custo de mercadorias (R$)</label><input type="number" step="0.01" id="relCusto"></div>
+      <div class="field"><label>Despesas (R$)</label><input type="number" step="0.01" id="relDespesas"></div>
       <button class="primary" onclick="saveRelatorio()">Salvar</button>
     </div>
 
@@ -295,20 +276,21 @@
       <div class="row"><span>Total vendido</span><span class="amt income" id="relOutVendido">R$ 0</span></div>
       <div class="row"><span>Total recebido</span><span class="amt income" id="relOutRecebido">R$ 0</span></div>
       <div class="row"><span>Custo de mercadorias</span><span class="amt expense" id="relOutCusto">R$ 0</span></div>
+      <div class="row"><span>Despesas</span><span class="amt expense" id="relOutDespesas">R$ 0</span></div>
       <div class="row"><span>Lucro</span><span class="amt" id="relOutLucro">R$ 0</span></div>
       <div class="row"><span>Margem de lucro</span><span id="relOutMargem">—</span></div>
     </div>
   </div>
 
-  <!-- METAS -->
+  <!-- DÍVIDAS -->
   <div class="panel" id="panel-metas">
     <div class="card">
-      <h3>Nova meta</h3>
+      <h3>Nova dívida</h3>
       <div class="two-col">
-        <div class="field"><label>Nome da meta</label><input type="text" id="goalName" placeholder="ex: Reserva de emergência"></div>
-        <div class="field"><label>Valor alvo (R$)</label><input type="number" step="0.01" id="goalTarget"></div>
+        <div class="field"><label>Nome da dívida</label><input type="text" id="goalName" placeholder="ex: Cartão Nubank, Empréstimo"></div>
+        <div class="field"><label>Valor total da dívida (R$)</label><input type="number" step="0.01" id="goalTarget"></div>
       </div>
-      <button class="primary" onclick="addGoal()">Criar meta</button>
+      <button class="primary" onclick="addGoal()">Adicionar dívida</button>
     </div>
     <div id="goalsList"></div>
   </div>
@@ -490,7 +472,6 @@ function render(){
   }
 
   renderCategoryBreakdown(monthTx, expense);
-  renderCard(monthTx);
   renderGoals();
   renderHistory();
   renderAgenda();
@@ -503,23 +484,26 @@ function renderRelatorio(){
   const monthLabelEl = document.getElementById('relMonthLabel');
   if(monthLabelEl) monthLabelEl.textContent = currentDate.toLocaleDateString('pt-BR',{month:'long',year:'numeric'});
 
-  const r = state.relatorio[key] || {vendido:0, recebido:0, custo:0};
+  const r = state.relatorio[key] || {vendido:0, recebido:0, custo:0, despesas:0};
   const vendidoEl = document.getElementById('relVendido');
   const recebidoEl = document.getElementById('relRecebido');
   const custoEl = document.getElementById('relCusto');
-  if(!vendidoEl || !recebidoEl || !custoEl) return;
+  const despesasEl = document.getElementById('relDespesas');
+  if(!vendidoEl || !recebidoEl || !custoEl || !despesasEl) return;
   vendidoEl.value = r.vendido || '';
   recebidoEl.value = r.recebido || '';
   custoEl.value = r.custo || '';
+  despesasEl.value = r.despesas || '';
   updateRelatorioOutputs(r);
 }
 
 function updateRelatorioOutputs(r){
-  const lucro = (r.recebido||0) - (r.custo||0);
+  const lucro = (r.recebido||0) - (r.custo||0) - (r.despesas||0);
   const margem = r.recebido>0 ? (lucro/r.recebido*100) : 0;
   document.getElementById('relOutVendido').textContent = fmt(r.vendido);
   document.getElementById('relOutRecebido').textContent = fmt(r.recebido);
   document.getElementById('relOutCusto').textContent = fmt(r.custo);
+  document.getElementById('relOutDespesas').textContent = fmt(r.despesas);
   const lucroEl = document.getElementById('relOutLucro');
   lucroEl.textContent = fmt(lucro);
   lucroEl.className = 'amt ' + (lucro>=0 ? 'income' : 'expense');
@@ -531,8 +515,9 @@ async function saveRelatorio(){
   const vendido = parseFloat(document.getElementById('relVendido').value) || 0;
   const recebido = parseFloat(document.getElementById('relRecebido').value) || 0;
   const custo = parseFloat(document.getElementById('relCusto').value) || 0;
+  const despesas = parseFloat(document.getElementById('relDespesas').value) || 0;
   if(!state.relatorio) state.relatorio = {};
-  state.relatorio[key] = {vendido, recebido, custo};
+  state.relatorio[key] = {vendido, recebido, custo, despesas};
   await persistState();
   updateRelatorioOutputs(state.relatorio[key]);
 }
@@ -581,17 +566,21 @@ function renderGoals(){
   if(state.goals.length===0){ el.innerHTML=''; return; }
   el.innerHTML = state.goals.map(g=>{
     const pct = g.target>0 ? Math.min(g.saved/g.target*100,100) : 0;
+    const quitada = g.saved >= g.target && g.target>0;
+    const falta = Math.max(g.target - g.saved, 0);
     return `<div class="card goal-card">
       <div class="goal-head">
-        <span class="goal-name">${g.name}</span>
+        <span class="goal-name">${g.name}${quitada?' <span class="badge pessoal">Quitada 🎉</span>':''}</span>
         <span class="delete-x" onclick="deleteGoal('${g.id}')">✕</span>
       </div>
-      <div class="goal-nums">${fmt(g.saved)} de ${fmt(g.target)} (${pct.toFixed(0)}%)</div>
+      <div class="goal-nums">${fmt(g.saved)} pago de ${fmt(g.target)} (${pct.toFixed(0)}%)</div>
+      <div class="goal-nums" style="margin-top:2px;">${quitada ? 'Nada mais a pagar' : 'Falta: <span class="amt expense">'+fmt(falta)+'</span>'}</div>
       <div class="bar-bg"><div class="bar-fill goal-bar-fill" style="width:${pct}%"></div></div>
+      ${quitada ? '' : `
       <div class="two-col" style="margin-top:10px;">
-        <input type="number" step="0.01" placeholder="Valor a adicionar" id="add-${g.id}">
-        <button class="ghost" onclick="addToGoal('${g.id}')">Adicionar valor</button>
-      </div>
+        <input type="number" step="0.01" placeholder="Valor pago agora" id="add-${g.id}">
+        <button class="ghost" onclick="addToGoal('${g.id}')">Registrar pagamento</button>
+      </div>`}
     </div>`;
   }).join('');
 }
