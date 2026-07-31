@@ -8,18 +8,18 @@
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#1B1A17;
-    --surface:#242220;
-    --surface-2:#2C2925;
-    --paper:#F3EEE3;
-    --ink:#F3EEE3;
-    --ink-soft:#B9B2A3;
-    --ink-faint:#8A8378;
-    --gold:#C9A15A;
-    --rust:#B06A52;
-    --sage:#8A9770;
-    --line:rgba(243,238,227,0.10);
-    --line-strong:rgba(243,238,227,0.20);
+    --bg:#F2EDE4;
+    --surface:#FFFDF8;
+    --surface-2:#ECE4D3;
+    --paper:#F2EDE4;
+    --ink:#2B2420;
+    --ink-soft:#6B6459;
+    --ink-faint:#9A8F7E;
+    --gold:#AD8A51;
+    --rust:#9B3B3B;
+    --sage:#3F6650;
+    --line:rgba(43,36,32,0.08);
+    --line-strong:rgba(43,36,32,0.18);
   }
   *{box-sizing:border-box;}
   body{
@@ -108,11 +108,11 @@
     flex:1;text-align:center;padding:9px;border-radius:8px;border:1px solid var(--line-strong);
     cursor:pointer;font-size:13px;font-weight:600;color:var(--ink-faint);
   }
-  .seg-btn.sel-income.on{background:rgba(201,161,90,0.15);border-color:var(--gold);color:var(--gold);}
-  .seg-btn.sel-expense.on{background:rgba(176,106,82,0.15);border-color:var(--rust);color:var(--rust);}
+  .seg-btn.sel-income.on{background:rgba(173,138,81,0.15);border-color:var(--gold);color:var(--gold);}
+  .seg-btn.sel-expense.on{background:rgba(155,59,59,0.15);border-color:var(--rust);color:var(--rust);}
   button.primary{
     width:100%;padding:12px;border-radius:9px;border:none;background:var(--gold);
-    color:#1B1A17;font-weight:700;font-size:14px;cursor:pointer;margin-top:4px;
+    color:var(--ink);font-weight:700;font-size:14px;cursor:pointer;margin-top:4px;
   }
   button.primary:hover{filter:brightness(1.08);}
   button.ghost{
@@ -142,14 +142,44 @@
     display:inline-block;font-size:10px;font-weight:700;text-transform:uppercase;
     letter-spacing:.03em;padding:2px 6px;border-radius:5px;margin-left:6px;vertical-align:middle;
   }
-  .badge.pessoal{background:rgba(138,151,112,0.18);color:var(--sage);}
-  .badge.empresa{background:rgba(201,161,90,0.18);color:var(--gold);}
+  .badge.pessoal{background:rgba(63,102,80,0.18);color:var(--sage);}
+  .badge.empresa{background:rgba(173,138,81,0.18);color:var(--gold);}
   .seg-origem{display:flex;gap:8px;margin-bottom:12px;}
   .seg-origem .seg-btn.on{background:var(--surface-2);border-color:var(--ink-soft);color:var(--ink);}
   #appRoot{display:block;}
   #syncStatus{
     text-align:center;font-size:11px;color:var(--ink-faint);margin-bottom:10px;
   }
+  .cal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+  .cal-title{font-family:'Fraunces',serif;font-size:15px;font-weight:500;text-transform:capitalize;}
+  .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;font-size:12px;}
+  .cal-grid .dow{text-align:center;color:var(--ink-faint);font-weight:600;padding-bottom:4px;font-size:10px;text-transform:uppercase;}
+  .cal-day{aspect-ratio:1;display:flex;align-items:center;justify-content:center;border-radius:7px;cursor:pointer;position:relative;color:var(--ink-soft);}
+  .cal-day:hover{background:var(--surface-2);}
+  .cal-day.empty{cursor:default;}
+  .cal-day.empty:hover{background:none;}
+  .cal-day.today{color:var(--gold);border:1px solid var(--gold);font-weight:700;}
+  .cal-day.selected{background:var(--gold);color:var(--ink);font-weight:700;}
+  .cal-day .dot{position:absolute;bottom:3px;width:4px;height:4px;border-radius:50%;background:var(--sage);}
+  .cal-day.selected .dot{background:var(--ink);}
+  .task-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px dashed var(--line);font-size:14px;}
+  .task-row:last-child{border-bottom:none;}
+  .task-time{width:48px;flex-shrink:0;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--gold);text-align:right;}
+  .task-time.empty{color:var(--ink-faint);}
+  .task-check{width:22px;height:22px;border-radius:6px;border:2px solid var(--gold);cursor:pointer;flex-shrink:0;background:var(--surface);display:flex;align-items:center;justify-content:center;color:var(--ink);font-size:14px;font-weight:700;transition:.15s;}
+  .task-check:hover{background:var(--surface-2);border-color:var(--rust);}
+  .task-check.done{background:var(--gold);border-color:var(--gold);}
+  .task-check.done:hover{filter:brightness(1.08);}
+  .task-text{flex:1;}
+  .task-text.done{text-decoration:line-through;color:var(--ink-faint);}
+  .notes-box{width:100%;min-height:70px;resize:vertical;background:var(--surface-2);border:1px solid var(--line-strong);color:var(--ink);padding:10px 12px;border-radius:8px;font-size:13.5px;font-family:'Inter',sans-serif;line-height:1.5;}
+  .notes-box:focus{outline:none;border-color:var(--gold);}
+  .report-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  @media (max-width:520px){ .report-grid{grid-template-columns:1fr;} }
+  .report-col{background:var(--surface-2);border-radius:10px;padding:14px 16px;}
+  .report-col-title{font-family:'Fraunces',serif;font-weight:600;font-size:15px;margin-bottom:8px;color:var(--ink);}
+  .report-col-empresa .report-col-title{color:var(--gold);}
+  .report-col .row{padding:6px 0;font-size:13px;}
 </style>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
@@ -170,7 +200,9 @@
     <div class="tab active" data-tab="visao">Visão Geral</div>
     <div class="tab" data-tab="gastos">Gastos</div>
     <div class="tab" data-tab="cartao">Cartão</div>
+    <div class="tab" data-tab="relatorio">Relatório</div>
     <div class="tab" data-tab="metas">Metas</div>
+    <div class="tab" data-tab="agenda">Agenda</div>
     <div class="tab" data-tab="historico">Histórico</div>
   </div>
 
@@ -205,7 +237,6 @@
         <div class="two-col">
           <div class="field"><label>Categoria</label>
             <select id="txCategory"></select>
-            <button type="button" class="ghost" style="margin-top:6px;width:100%;" onclick="addCustomCategory()">+ Nova categoria</button>
           </div>
           <div class="field"><label>Forma de pagamento</label>
             <select id="txMethod">
@@ -252,20 +283,44 @@
       <div class="bar-bg"><div class="bar-fill" id="ccBar" style="width:0%"></div></div>
       <div class="small-note">Calculado a partir dos lançamentos marcados como "Cartão de crédito" neste mês. Use o filtro Tudo/Pessoal/Empresa na Visão Geral pra ver só a parte da fatura que é de cada um.</div>
     </div>
+  </div>
+
+  <!-- RELATÓRIO -->
+  <div class="panel" id="panel-relatorio">
     <div class="card">
-      <h3>Lançar fatura total</h3>
-      <div class="small-note" style="margin-bottom:10px;">Use isso quando não quiser lançar item por item — soma tudo em um lançamento só. Não use junto com lançamentos detalhados no mesmo mês, pra não contar em dobro.</div>
-      <div class="two-col">
-        <div class="field"><label>Valor total (R$)</label><input type="number" step="0.01" id="invoiceTotal"></div>
-        <div class="field"><label>Dia de vencimento</label><input type="date" id="invoiceDueDate"></div>
+      <h3>Resumo do mês — Pessoal x Empresa</h3>
+      <div class="report-grid">
+        <div class="report-col">
+          <div class="report-col-title">Pessoal</div>
+          <div class="row"><span>Receitas</span><span class="amt income" id="repPessoalIncome">R$ 0</span></div>
+          <div class="row"><span>Despesas</span><span class="amt expense" id="repPessoalExpense">R$ 0</span></div>
+          <div class="row"><span>Saldo</span><span class="amt" id="repPessoalBalance">R$ 0</span></div>
+        </div>
+        <div class="report-col report-col-empresa">
+          <div class="report-col-title">Empresa</div>
+          <div class="row"><span>Receitas</span><span class="amt income" id="repEmpresaIncome">R$ 0</span></div>
+          <div class="row"><span>Despesas</span><span class="amt expense" id="repEmpresaExpense">R$ 0</span></div>
+          <div class="row"><span>Lucro</span><span class="amt" id="repEmpresaProfit">R$ 0</span></div>
+          <div class="row"><span>Margem de lucro</span><span id="repEmpresaMargin">—</span></div>
+        </div>
       </div>
-      <div class="field"><label>Origem</label>
-        <select id="invoiceOrigin">
-          <option value="pessoal">Pessoal</option>
-          <option value="empresa">Empresa</option>
-        </select>
-      </div>
-      <button class="primary" onclick="launchInvoiceTotal()">Lançar fatura total</button>
+    </div>
+
+    <div class="card">
+      <h3>Total geral do mês</h3>
+      <div class="row"><span>Receitas (pessoal + empresa)</span><span class="amt income" id="repTotalIncome">R$ 0</span></div>
+      <div class="row"><span>Despesas (pessoal + empresa)</span><span class="amt expense" id="repTotalExpense">R$ 0</span></div>
+      <div class="row"><span>Saldo</span><span class="amt" id="repTotalBalance">R$ 0</span></div>
+    </div>
+
+    <div class="card">
+      <h3>Gastos por categoria — Pessoal</h3>
+      <div id="repCatPessoal"><div class="empty">Sem despesas neste mês.</div></div>
+    </div>
+
+    <div class="card">
+      <h3>Gastos por categoria — Empresa</h3>
+      <div id="repCatEmpresa"><div class="empty">Sem despesas neste mês.</div></div>
     </div>
   </div>
 
@@ -280,6 +335,37 @@
       <button class="primary" onclick="addGoal()">Criar meta</button>
     </div>
     <div id="goalsList"></div>
+  </div>
+
+  <!-- AGENDA -->
+  <div class="panel" id="panel-agenda">
+    <div class="card">
+      <div class="cal-head">
+        <button class="ghost" onclick="changeAgendaMonth(-1)">‹</button>
+        <div class="cal-title" id="agendaCalTitle">—</div>
+        <button class="ghost" onclick="changeAgendaMonth(1)">›</button>
+      </div>
+      <div class="cal-grid" id="agendaCalGrid"></div>
+    </div>
+
+    <div class="card">
+      <h3 id="agendaDayTitle">—</h3>
+      <div class="two-col" style="grid-template-columns:90px 1fr;">
+        <div class="field"><input type="time" id="taskTime"></div>
+        <div class="field"><input type="text" id="taskText" placeholder="O que você precisa fazer?"></div>
+      </div>
+      <div class="seg">
+        <div class="seg-btn" id="taskStarBtn" onclick="toggleTaskStar()">★ Prioridade</div>
+        <button class="primary" style="flex:1;margin-top:0;" onclick="addTask()">Adicionar</button>
+      </div>
+      <div id="taskList"><div class="empty">Nenhuma tarefa ainda.</div></div>
+    </div>
+
+    <div class="card">
+      <h3>Notas rápidas</h3>
+      <textarea id="dayNotes" class="notes-box" placeholder="Anote algo sobre esse dia..."></textarea>
+      <div class="small-note" id="notesSaveHint">&nbsp;</div>
+    </div>
   </div>
 
   <!-- HISTÓRICO -->
@@ -299,16 +385,15 @@
 // Substitua as 6 linhas abaixo pelos valores que você copiou do Firebase.
 // Não apague as aspas, só troque o que está escrito "COLE_AQUI".
 // ====================================================================
-// ==================== FIM DO TRECHO A EDITAR =======================
 const firebaseConfig = {
-  apiKey: "AIzaSyCNzG5CrPOuQ10a3_lcTpDkgTDl9Ufp964",
-  authDomain: "financas-25686.firebaseapp.com",
-  projectId: "financas-25686",
-  storageBucket: "financas-25686.firebasestorage.app",
-  messagingSenderId: "120337190434",
-  appId: "1:120337190434:web:acf744cc8755f72586447b",
-  measurementId: "G-8CC0N3NF07"
+  apiKey: "COLE_AQUI",
+  authDomain: "COLE_AQUI.firebaseapp.com",
+  projectId: "COLE_AQUI",
+  storageBucket: "COLE_AQUI.appspot.com",
+  messagingSenderId: "COLE_AQUI",
+  appId: "COLE_AQUI"
 };
+// ==================== FIM DO TRECHO A EDITAR =======================
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 const userDocRef = db.collection('financas_pessoais').doc('bruna');
@@ -323,10 +408,8 @@ function listenToData(){
     state.transactions = data.transactions || [];
     state.card = data.card || {limit:0, dueDay:5};
     state.goals = data.goals || [];
-    state.customExpense = data.customExpense || [];
-    state.customIncome = data.customIncome || [];
+    state.agenda = data.agenda || {tasks:{}, notes:{}};
     render();
-    populateCategories();
     document.getElementById('syncStatus').textContent = 'Sincronizado';
   }, err=>{
     document.getElementById('syncStatus').textContent = 'Erro de conexão';
@@ -341,8 +424,7 @@ async function persistState(){
       transactions: state.transactions,
       card: state.card,
       goals: state.goals,
-      customExpense: state.customExpense,
-      customIncome: state.customIncome
+      agenda: state.agenda
     });
     document.getElementById('syncStatus').textContent = 'Sincronizado';
   }catch(e){
@@ -355,7 +437,7 @@ async function persistState(){
 const CATEGORIES_EXPENSE = ["Fornecedores/Estoque","Aluguel","Contas fixas","Assinaturas","Supermercado","Restaurante","Alimentação","Transporte","Beleza","Marketing","Salários","Lazer","Saúde","Outros"];
 const CATEGORIES_INCOME = ["Vendas loja","Vendas online","Outras receitas"];
 
-let state = { transactions: [], card: {limit:0, dueDay:5}, goals: [], customExpense: [], customIncome: [] };
+let state = { transactions: [], card: {limit:0, dueDay:5}, goals: [], agenda: {tasks:{}, notes:{}} };
 let currentDate = new Date();
 let txType = 'income';
 let txOrigin = 'pessoal';
@@ -392,20 +474,8 @@ function setTxType(t){
 }
 function populateCategories(){
   const sel = document.getElementById('txCategory');
-  const cats = txType==='income' ? CATEGORIES_INCOME.concat(state.customIncome) : CATEGORIES_EXPENSE.concat(state.customExpense);
+  const cats = txType==='income' ? CATEGORIES_INCOME : CATEGORIES_EXPENSE;
   sel.innerHTML = cats.map(c=>`<option value="${c}">${c}</option>`).join('');
-}
-function addCustomCategory(){
-  const name = prompt('Nome da nova categoria:');
-  if(!name || !name.trim()) return;
-  const clean = name.trim();
-  const list = txType==='income' ? state.customIncome : state.customExpense;
-  const allExisting = (txType==='income' ? CATEGORIES_INCOME : CATEGORIES_EXPENSE).concat(list);
-  if(allExisting.some(c=>c.toLowerCase()===clean.toLowerCase())) { populateCategories(); document.getElementById('txCategory').value = clean; return; }
-  list.push(clean);
-  persistState();
-  populateCategories();
-  document.getElementById('txCategory').value = clean;
 }
 
 function changeMonth(delta){
@@ -445,6 +515,63 @@ function render(){
   renderCard(monthTx);
   renderGoals();
   renderHistory();
+  renderAgenda();
+  renderRelatorio();
+}
+
+function renderRelatorio(){
+  const monthTx = txForMonth(currentDate);
+  const pessoal = monthTx.filter(t => (t.origin||'pessoal') === 'pessoal');
+  const empresa = monthTx.filter(t => (t.origin||'pessoal') === 'empresa');
+
+  function sums(list){
+    const income = list.filter(t=>t.type==='income').reduce((a,t)=>a+t.amount,0);
+    const expense = list.filter(t=>t.type==='expense').reduce((a,t)=>a+t.amount,0);
+    return {income, expense, balance: income-expense};
+  }
+  const p = sums(pessoal);
+  const e = sums(empresa);
+
+  document.getElementById('repPessoalIncome').textContent = fmt(p.income);
+  document.getElementById('repPessoalExpense').textContent = fmt(p.expense);
+  const pBalEl = document.getElementById('repPessoalBalance');
+  pBalEl.textContent = fmt(p.balance);
+  pBalEl.className = 'amt ' + (p.balance>=0 ? 'income' : 'expense');
+
+  document.getElementById('repEmpresaIncome').textContent = fmt(e.income);
+  document.getElementById('repEmpresaExpense').textContent = fmt(e.expense);
+  const eProfitEl = document.getElementById('repEmpresaProfit');
+  eProfitEl.textContent = fmt(e.balance);
+  eProfitEl.className = 'amt ' + (e.balance>=0 ? 'income' : 'expense');
+  const margin = e.income>0 ? (e.balance/e.income*100) : 0;
+  document.getElementById('repEmpresaMargin').textContent = e.income>0 ? margin.toFixed(1)+'%' : '—';
+
+  document.getElementById('repTotalIncome').textContent = fmt(p.income+e.income);
+  document.getElementById('repTotalExpense').textContent = fmt(p.expense+e.expense);
+  const totBalEl = document.getElementById('repTotalBalance');
+  const totBal = (p.income+e.income) - (p.expense+e.expense);
+  totBalEl.textContent = fmt(totBal);
+  totBalEl.className = 'amt ' + (totBal>=0 ? 'income' : 'expense');
+
+  renderCatByOrigin(pessoal, 'repCatPessoal');
+  renderCatByOrigin(empresa, 'repCatEmpresa');
+}
+
+function renderCatByOrigin(list, elId){
+  const el = document.getElementById(elId);
+  if(!el) return;
+  const expenses = list.filter(t=>t.type==='expense');
+  if(expenses.length===0){ el.innerHTML = '<div class="empty">Sem despesas neste mês.</div>'; return; }
+  const total = expenses.reduce((a,t)=>a+t.amount,0);
+  const byCat = {};
+  expenses.forEach(t=> byCat[t.category] = (byCat[t.category]||0) + t.amount);
+  el.innerHTML = Object.entries(byCat).sort((a,b)=>b[1]-a[1]).map(([cat,val])=>{
+    const pct = total>0 ? (val/total*100) : 0;
+    return `<div style="margin-bottom:12px;">
+      <div class="flex-between"><span>${cat}</span><span class="amt expense">${fmt(val)}</span></div>
+      <div class="bar-bg"><div class="bar-fill" style="width:${pct}%"></div></div>
+    </div>`;
+  }).join('');
 }
 
 function methodLabel(m){
@@ -483,18 +610,6 @@ async function saveCardConfig(){
   state.card.limit = parseFloat(document.getElementById('ccLimit').value)||0;
   state.card.dueDay = parseInt(document.getElementById('ccDueDay').value)||5;
   await saveCard();
-  render();
-}
-
-async function launchInvoiceTotal(){
-  const amount = parseFloat(document.getElementById('invoiceTotal').value);
-  const date = document.getElementById('invoiceDueDate').value;
-  const origin = document.getElementById('invoiceOrigin').value;
-  if(!amount || !date) return;
-  state.transactions.push({id:Date.now().toString(), type:'expense', amount, date, category:'Fatura do cartão (total)', method:'credito', note:'', origin});
-  await saveTx();
-  document.getElementById('invoiceTotal').value='';
-  document.getElementById('invoiceDueDate').value='';
   render();
 }
 
@@ -574,6 +689,140 @@ async function deleteTx(id){
   state.transactions = state.transactions.filter(t=>t.id!==id);
   await saveTx();
   render();
+}
+
+// ==================== AGENDA ====================
+let agendaCalDate = new Date();
+let agendaSelectedDate = fmtDateAgenda(new Date());
+let taskStarOn = false;
+
+function fmtDateAgenda(d){
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+function parseLocalDate(s){
+  const [y,m,d] = s.split('-').map(Number);
+  return new Date(y, m-1, d);
+}
+function todayStrAgenda(){ return fmtDateAgenda(new Date()); }
+
+function changeAgendaMonth(delta){
+  agendaCalDate.setMonth(agendaCalDate.getMonth()+delta);
+  renderAgenda();
+}
+
+function selectAgendaDay(ds){
+  agendaSelectedDate = ds;
+  renderAgenda();
+}
+
+function toggleTaskStar(){
+  taskStarOn = !taskStarOn;
+  document.getElementById('taskStarBtn').classList.toggle('on', taskStarOn);
+}
+
+async function addTask(){
+  const textEl = document.getElementById('taskText');
+  const timeEl = document.getElementById('taskTime');
+  const text = textEl.value.trim();
+  if(!text) return;
+  if(!state.agenda.tasks[agendaSelectedDate]) state.agenda.tasks[agendaSelectedDate] = [];
+  state.agenda.tasks[agendaSelectedDate].push({
+    id: Date.now().toString(), text, done:false, priority: taskStarOn, time: timeEl.value || ''
+  });
+  textEl.value = '';
+  timeEl.value = '';
+  taskStarOn = false;
+  document.getElementById('taskStarBtn').classList.remove('on');
+  await persistState();
+  renderAgenda();
+}
+
+async function toggleTaskDone(ds, id){
+  const t = state.agenda.tasks[ds].find(x=>x.id===id);
+  t.done = !t.done;
+  await persistState();
+  renderAgenda();
+}
+
+async function deleteTask(ds, id){
+  state.agenda.tasks[ds] = state.agenda.tasks[ds].filter(x=>x.id!==id);
+  await persistState();
+  renderAgenda();
+}
+
+let notesDebounce = null;
+function onNotesInput(){
+  clearTimeout(notesDebounce);
+  const hint = document.getElementById('notesSaveHint');
+  hint.textContent = 'Digitando...';
+  notesDebounce = setTimeout(async ()=>{
+    state.agenda.notes[agendaSelectedDate] = document.getElementById('dayNotes').value;
+    await persistState();
+    hint.textContent = 'Salvo ✓';
+  }, 600);
+}
+
+function renderAgenda(){
+  if(!state.agenda) state.agenda = {tasks:{}, notes:{}};
+  renderAgendaCal();
+  renderAgendaDay();
+}
+
+function renderAgendaCal(){
+  const grid = document.getElementById('agendaCalGrid');
+  const title = document.getElementById('agendaCalTitle');
+  if(!grid || !title) return;
+  const dow = ['D','S','T','Q','Q','S','S'];
+  const y = agendaCalDate.getFullYear(), m = agendaCalDate.getMonth();
+  const first = new Date(y, m, 1);
+  const startOffset = first.getDay();
+  const daysInMonth = new Date(y, m+1, 0).getDate();
+  title.textContent = first.toLocaleDateString('pt-BR', {month:'long', year:'numeric'});
+
+  let cells = dow.map(d=>`<div class="dow">${d}</div>`).join('');
+  for(let i=0;i<startOffset;i++) cells += '<div class="cal-day empty"></div>';
+  for(let d=1; d<=daysInMonth; d++){
+    const ds = fmtDateAgenda(new Date(y, m, d));
+    const hasTasks = state.agenda.tasks[ds] && state.agenda.tasks[ds].length>0;
+    let cls = 'cal-day';
+    if(ds === todayStrAgenda()) cls += ' today';
+    if(ds === agendaSelectedDate) cls += ' selected';
+    cells += `<div class="${cls}" onclick="selectAgendaDay('${ds}')">${d}${hasTasks?'<span class="dot"></span>':''}</div>`;
+  }
+  grid.innerHTML = cells;
+}
+
+function renderAgendaDay(){
+  const titleEl = document.getElementById('agendaDayTitle');
+  const listEl = document.getElementById('taskList');
+  const notesEl = document.getElementById('dayNotes');
+  if(!titleEl || !listEl || !notesEl) return;
+
+  const dateObj = parseLocalDate(agendaSelectedDate);
+  const label = dateObj.toLocaleDateString('pt-BR', {weekday:'long', day:'numeric', month:'long'});
+  titleEl.textContent = label.charAt(0).toUpperCase() + label.slice(1);
+
+  const tasks = (state.agenda.tasks[agendaSelectedDate] || []).slice().sort((a,b)=>{
+    const at = a.time || '99:99', bt = b.time || '99:99';
+    if(at !== bt) return at < bt ? -1 : 1;
+    return (b.priority?1:0) - (a.priority?1:0);
+  });
+
+  if(tasks.length===0){
+    listEl.innerHTML = '<div class="empty">Nenhuma tarefa ainda.</div>';
+  }else{
+    listEl.innerHTML = tasks.map(t=>`
+      <div class="task-row">
+        <span class="task-time ${t.time?'':'empty'}">${t.time || '·····'}</span>
+        <div class="task-check ${t.done?'done':''}" onclick="toggleTaskDone('${agendaSelectedDate}','${t.id}')">${t.done?'✓':''}</div>
+        <span class="task-text ${t.done?'done':''}">${t.priority?'★ ':''}${t.text}</span>
+        <span class="delete-x" onclick="deleteTask('${agendaSelectedDate}','${t.id}')">✕</span>
+      </div>`).join('');
+  }
+
+  notesEl.value = state.agenda.notes[agendaSelectedDate] || '';
+  document.getElementById('notesSaveHint').innerHTML = '&nbsp;';
+  notesEl.oninput = onNotesInput;
 }
 
 document.getElementById('txForm').addEventListener('submit', async (e)=>{
