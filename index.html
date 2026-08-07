@@ -174,6 +174,20 @@
   .task-text.done{text-decoration:line-through;color:var(--ink-faint);}
   .notes-box{width:100%;min-height:70px;resize:vertical;background:var(--surface-2);border:1px solid var(--line-strong);color:var(--ink);padding:10px 12px;border-radius:8px;font-size:13.5px;font-family:'Inter',sans-serif;line-height:1.5;}
   .notes-box:focus{outline:none;border-color:var(--gold);}
+  .cat-manage{margin-top:8px;}
+  .cat-manage-toggle{font-size:12px;color:var(--gold);cursor:pointer;user-select:none;display:inline-block;margin-top:2px;}
+  .cat-manage-toggle:hover{text-decoration:underline;}
+  .cat-manage-box{margin-top:10px;padding:12px;background:var(--surface-2);border-radius:8px;display:none;}
+  .cat-manage-box.open{display:block;}
+  .cat-add-row{display:flex;gap:8px;}
+  .cat-add-row input{flex:1;}
+  .cat-add-row button{flex-shrink:0;width:auto;padding:10px 14px;margin-top:0;}
+  .cat-chip-list{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;}
+  .cat-chip{
+    display:flex;align-items:center;gap:5px;background:var(--surface);border:1px solid var(--line-strong);
+    border-radius:20px;padding:5px 6px 5px 12px;font-size:12px;color:var(--ink-soft);
+  }
+  .cat-chip .delete-x{margin-left:0;}
 </style>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
@@ -240,7 +254,18 @@
             </select>
           </div>
         </div>
-        <div class="field"><label>Observação (opcional)</label><input type="text" id="txNote" placeholder="ex: mercado, fornecedor..."></div>
+        <div class="cat-manage">
+          <span class="cat-manage-toggle" onclick="toggleCatManage()">+ Gerenciar categorias</span>
+          <div class="cat-manage-box" id="catManageBox">
+            <div class="cat-add-row">
+              <input type="text" id="newCatName" placeholder="Nome da nova categoria">
+              <button type="button" class="primary" onclick="addCategory()">Adicionar</button>
+            </div>
+            <div class="small-note" id="catManageHint">Escolha Receita ou Despesa acima para editar essa lista.</div>
+            <div class="cat-chip-list" id="catChipList"></div>
+          </div>
+        </div>
+        <div class="field" style="margin-top:12px;"><label>Observação (opcional)</label><input type="text" id="txNote" placeholder="ex: mercado, fornecedor..."></div>
         <button type="submit" class="primary">Adicionar</button>
       </form>
     </div>
@@ -368,6 +393,7 @@ function listenToData(){
     state.goals = data.goals || [];
     state.agenda = data.agenda || {tasks:{}, notes:{}};
     state.relatorio = data.relatorio || {};
+    state.categories = data.categories || {income: [...CATEGORIES_INCOME_DEFAULT], expense: [...CATEGORIES_EXPENSE_DEFAULT]};
     render();
     document.getElementById('syncStatus').textContent = 'Sincronizado';
   }, err=>{
@@ -384,7 +410,8 @@ async function persistState(){
       card: state.card,
       goals: state.goals,
       agenda: state.agenda,
-      relatorio: state.relatorio
+      relatorio: state.relatorio,
+      categories: state.categories
     });
     document.getElementById('syncStatus').textContent = 'Sincronizado';
   }catch(e){
@@ -394,14 +421,15 @@ async function persistState(){
 }
 </script>
 <script>
-const CATEGORIES_EXPENSE = ["Fornecedores/Estoque","Aluguel","Contas fixas","Assinaturas","Supermercado","Restaurante","Alimentação","Transporte","Beleza","Marketing","Salários","Lazer","Saúde","Outros"];
-const CATEGORIES_INCOME = ["Vendas loja","Vendas online","Outras receitas"];
+const CATEGORIES_EXPENSE_DEFAULT = ["Fornecedores/Estoque","Aluguel","Contas fixas","Assinaturas","Supermercado","Restaurante","Alimentação","Transporte","Beleza","Marketing","Salários","Lazer","Saúde","Outros"];
+const CATEGORIES_INCOME_DEFAULT = ["Vendas loja","Vendas online","Outras receitas"];
 
-let state = { transactions: [], card: {limit:0, dueDay:5}, goals: [], agenda: {tasks:{}, notes:{}}, relatorio: {} };
+let state = { transactions: [], card: {limit:0, dueDay:5}, goals: [], agenda: {tasks:{}, notes:{}}, relatorio: {}, categories: {income:[...CATEGORIES_INCOME_DEFAULT], expense:[...CATEGORIES_EXPENSE_DEFAULT]} };
 let currentDate = new Date();
 let txType = 'income';
 let txOrigin = 'pessoal';
 let originFilter = 'tudo';
+let catManageOpen = false;
 
 function setTxOrigin(o){
   txOrigin = o;
@@ -431,11 +459,58 @@ function setTxType(t){
   document.getElementById('btnIncome').classList.toggle('on', t==='income');
   document.getElementById('btnExpense').classList.toggle('on', t==='expense');
   populateCategories();
+  renderCatManage();
 }
 function populateCategories(){
   const sel = document.getElementById('txCategory');
-  const cats = txType==='income' ? CATEGORIES_INCOME : CATEGORIES_EXPENSE;
+  const cats = state.categories[txType];
   sel.innerHTML = cats.map(c=>`<option value="${c}">${c}</option>`).join('');
+}
+
+// ==================== GERENCIAR CATEGORIAS ====================
+function toggleCatManage(){
+  catManageOpen = !catManageOpen;
+  const box = document.getElementById('catManageBox');
+  box.classList.toggle('open', catManageOpen);
+  if(catManageOpen) renderCatManage();
+}
+
+function renderCatManage(){
+  const hint = document.getElementById('catManageHint');
+  const chipList = document.getElementById('catChipList');
+  if(!hint || !chipList) return;
+  hint.textContent = `Editando categorias de ${txType==='income' ? 'receita' : 'despesa'}. Troque Receita/Despesa acima para editar a outra lista.`;
+  const cats = state.categories[txType];
+  chipList.innerHTML = cats.map(c=>`
+    <span class="cat-chip">${c}<span class="delete-x" onclick="deleteCategory('${c.replace(/'/g,"\\'")}')">✕</span></span>
+  `).join('');
+}
+
+async function addCategory(){
+  const input = document.getElementById('newCatName');
+  const name = input.value.trim();
+  if(!name) return;
+  if(!state.categories) state.categories = {income:[...CATEGORIES_INCOME_DEFAULT], expense:[...CATEGORIES_EXPENSE_DEFAULT]};
+  if(state.categories[txType].some(c=>c.toLowerCase()===name.toLowerCase())){
+    input.value='';
+    return; // já existe
+  }
+  state.categories[txType].push(name);
+  input.value = '';
+  await persistState();
+  populateCategories();
+  renderCatManage();
+  // seleciona a categoria recém-criada
+  document.getElementById('txCategory').value = name;
+}
+
+async function deleteCategory(name){
+  const cats = state.categories[txType];
+  if(cats.length<=1) return; // mantém sempre pelo menos 1 categoria
+  state.categories[txType] = cats.filter(c=>c!==name);
+  await persistState();
+  populateCategories();
+  renderCatManage();
 }
 
 function changeMonth(delta){
@@ -452,6 +527,9 @@ function render(){
   const monthName = currentDate.toLocaleDateString('pt-BR',{month:'long',year:'numeric'});
   document.getElementById('monthTitle').textContent = monthName;
   document.getElementById('txDate').value = new Date().toISOString().slice(0,10);
+
+  populateCategories();
+  if(catManageOpen) renderCatManage();
 
   const monthTx = applyFilter(txForMonth(currentDate));
   const income = monthTx.filter(t=>t.type==='income').reduce((a,t)=>a+t.amount,0);
