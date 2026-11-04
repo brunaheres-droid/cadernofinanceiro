@@ -514,8 +514,25 @@ async function deleteCategory(name){
 }
 
 function changeMonth(delta){
+  currentDate.setDate(1);
   currentDate.setMonth(currentDate.getMonth()+delta);
   render();
+}
+
+// Data do lançamento acompanha o mês que está aberto no app.
+// Mês atual → hoje. Outro mês → mantém o dia já escolhido se for daquele mês; senão, dia 1.
+function syncTxDateToMonth(){
+  const el = document.getElementById('txDate');
+  const key = monthKey(currentDate);
+  const today = new Date();
+  if(key === monthKey(today)){
+    if(!el.value || el.value.slice(0,7) !== key){
+      el.value = today.getFullYear()+'-'+String(today.getMonth()+1).padStart(2,'0')+'-'+String(today.getDate()).padStart(2,'0');
+    }
+    return;
+  }
+  if(el.value && el.value.slice(0,7) === key) return;
+  el.value = key + '-01';
 }
 
 function txForMonth(d){
@@ -526,7 +543,7 @@ function txForMonth(d){
 function render(){
   const monthName = currentDate.toLocaleDateString('pt-BR',{month:'long',year:'numeric'});
   document.getElementById('monthTitle').textContent = monthName;
-  document.getElementById('txDate').value = new Date().toISOString().slice(0,10);
+  syncTxDateToMonth();
 
   populateCategories();
   if(catManageOpen) renderCatManage();
